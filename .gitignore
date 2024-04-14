@@ -1,2 +1,2 @@
 # Only track .hs files
-!.hs
+!*.hs
