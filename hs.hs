@@ -29,3 +29,18 @@ Newton's method is:
 squareroot n 0 return = return n
 squareroot n i return = squareroot n (i - 1) (\old -> return (old - ((old * old) - n) / (2 * old)))
 
+-- Author: Alex Wang -- 
+-- Part 2: Haskell Higher Order Functions --
+
+{-
+3. listmax takes a non-empty list of numbers and
+returns the maximum value in the list.
+-}
+listmax l = foldl max (head l) l
+
+{-
+4. removedups takes a list and returns the list
+with all consecutive duplicate values removed.
+-}
+removedups :: (Eq a) => [a] -> [a]
+removedups = foldr (\x acc -> if null acc || x /= head acc then x : acc else acc) []
