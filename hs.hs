@@ -89,8 +89,8 @@ removed.
 -}
 data BinaryTree t = Empty | Leaf t | InnerNode t (BinaryTree t) (BinaryTree t) deriving (Show)
 
-removeMin Empty                         = Empty    -- min cannot be removed from Empty
-removeMin (Leaf _)                      = Empty    -- min removed from Leaf is Empty
-removeMin (InnerNode val Empty right)   = right    -- min removed from InnerNode w/o left is right
-removeMin (InnerNode val (Leaf left) _) = Leaf val -- min removed from InnerNode w/ Leaf left is the InnerNode
-removeMin (InnerNode val left right)    = InnerNode val (removeMin left) right
+removeMin Empty                             = Empty    -- min cannot be removed from Empty
+removeMin (Leaf _)                          = Empty    -- min removed from Leaf is Empty
+removeMin (InnerNode val Empty right)       = right    -- min removed from InnerNode w/o left is right
+removeMin (InnerNode val (Leaf left) Empty) = Leaf val -- min removed from InnerNode w/ Leaf left and Empty right
+removeMin (InnerNode val left right)        = InnerNode val (removeMin left) right -- removeMin from the left
