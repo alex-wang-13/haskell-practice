@@ -69,14 +69,25 @@ first input, it is replaced by the second, if an
 the third, and if it is the "third" input, it is
 replaced by the first.
 -}
-grotate :: (Eq t) => t -> t -> t -> NestedList t -> NestedList t
-grotate a b c (Element x)
-    | a == x        = Element b
+grotate a b c [] = []
+grotate a b c l  = map (_grotate a b c) l
+
+{-
+_grotate is a needed helper function for grotate.
+grotate takes [NestedList] and gives [NestedList]
+while _grotate takes a NestedList and gives a
+NestedList. While this difference is subtle, it
+shows why we need two different functions because
+the output of one function cannot depend on the
+input to that function.
+-}
+_grotate a b c (Element x)
+    | a == x        = Element b 
     | b == x        = Element c
     | c == x        = Element a
     | otherwise     = Element x
-grotate a b c (SubList []) = SubList []
--- grotate a b c (SubList l) = SubList (map (grotate a b c) l)
+_grotate a b c (SubList []) = SubList []
+_grotate a b c (SubList l)  = SubList (map (_grotate a b c) l)
 
 {-
 6. removeMin that takes a Tree as input. Assuming
@@ -94,3 +105,4 @@ removeMin (Leaf _)                          = Empty    -- min removed from Leaf 
 removeMin (InnerNode val Empty right)       = right    -- min removed from InnerNode w/o left is right
 removeMin (InnerNode val (Leaf left) Empty) = Leaf val -- min removed from InnerNode w/ Leaf left and Empty right
 removeMin (InnerNode val left right)        = InnerNode val (removeMin left) right -- removeMin from the left
+
