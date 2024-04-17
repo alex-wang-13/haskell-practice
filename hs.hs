@@ -1,4 +1,3 @@
-import Distribution.Simple.PackageIndex (SearchResult(None))
 -- Author: Alex Wang --
 -- Part 1: Haskell Functions --
 
@@ -10,6 +9,7 @@ element is replaced by the second, the second
 element is replaced by the third, and the third
 is replaced by the first.
 -}
+rotate :: Eq a => a -> a -> a -> [a] -> [a]
 rotate _ _ _ []    = []
 rotate a b c (h:t)
     | h == a       = b : rotate a b c t
@@ -27,6 +27,7 @@ with an initial value equal to the input value.
 Newton's method is:
     new = old - ((old * old) - value) / (2 * old)
 -}
+squareroot :: (Eq t1, Num t1, Fractional t2) => t2 -> t1 -> (t2 -> t3) -> t3
 squareroot n 0 return = return n
 squareroot n i return = squareroot n (i - 1) (\old -> return (old - ((old * old) - n) / (2 * old)))
 
@@ -37,6 +38,7 @@ squareroot n i return = squareroot n (i - 1) (\old -> return (old - ((old * old)
 3. listmax takes a non-empty list of numbers and
 returns the maximum value in the list.
 -}
+listmax :: Ord a => [a] -> a
 listmax l = foldl max (head l) l
 
 {-
@@ -69,6 +71,7 @@ first input, it is replaced by the second, if an
 the third, and if it is the "third" input, it is
 replaced by the first.
 -}
+grotate :: Eq t => t -> t -> t -> [NestedList t] -> [NestedList t]
 grotate a b c [] = []
 grotate a b c l  = map (_grotate a b c) l
 
@@ -81,8 +84,9 @@ shows why we need two different functions because
 the output of one function cannot depend on the
 input to that function.
 -}
+_grotate :: Eq t => t -> t -> t -> NestedList t -> NestedList t
 _grotate a b c (Element x)
-    | a == x        = Element b 
+    | a == x        = Element b
     | b == x        = Element c
     | c == x        = Element a
     | otherwise     = Element x
@@ -100,6 +104,7 @@ removed.
 -}
 data BinaryTree t = Empty | Leaf t | InnerNode t (BinaryTree t) (BinaryTree t) deriving (Show)
 
+removeMin :: BinaryTree t -> BinaryTree t
 removeMin Empty                             = Empty    -- min cannot be removed from Empty
 removeMin (Leaf _)                          = Empty    -- min removed from Leaf is Empty
 removeMin (InnerNode val Empty right)       = right    -- min removed from InnerNode w/o left is right
