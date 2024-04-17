@@ -1,3 +1,4 @@
+import Distribution.Simple.PackageIndex (SearchResult(None))
 -- Author: Alex Wang --
 -- Part 1: Haskell Functions --
 
@@ -44,3 +45,52 @@ with all consecutive duplicate values removed.
 -}
 removedups :: (Eq a) => [a] -> [a]
 removedups = foldr (\x acc -> if null acc || x /= head acc then x : acc else acc) []
+
+-- Author: Alex Wang --
+-- Part 2: Haskell Types --
+
+{-
+5. Create a type that allows us to have nested
+lists. Your type should have two kinds of values,
+elements and sublists. For example, the following
+will be a valid list:
+
+[Element 1, Element 3, SubList [Element 4, SubList
+    [SubList [Element 5], SubList []]], Element 6]
+-}
+data NestedList t = Element t | SubList [NestedList t] deriving (Show)
+
+{-
+5. grotate takes three values and list containing
+elements and sublists and returns a list with
+the same structure, but if any "element" is the
+first input, it is replaced by the second, if an
+"element" is the second input, it is replaced by
+the third, and if it is the "third" input, it is
+replaced by the first.
+-}
+grotate :: (Eq t) => t -> t -> t -> NestedList t -> NestedList t
+grotate a b c (Element x)
+    | a == x        = Element b
+    | b == x        = Element c
+    | c == x        = Element a
+    | otherwise     = Element x
+grotate a b c (SubList []) = SubList []
+-- grotate a b c (SubList l) = SubList (map (grotate a b c) l)
+
+{-
+6. removeMin that takes a Tree as input. Assuming
+the tree is in proper order (all values in the
+left child are smaller than the value in the node,
+and all the values in the right child are equal or
+larger than the node), the function will return a
+new tree with the smallest value of the tree
+removed.
+-}
+data BinaryTree t = Empty | Leaf t | InnerNode t (BinaryTree t) (BinaryTree t) deriving (Show)
+
+removeMin Empty = Empty
+removeMin (Leaf _) = Empty
+removeMin (InnerNode val Empty right) = right
+removeMin (InnerNode val (Leaf left) Empty) = Leaf val
+removeMin (InnerNode val left right) = InnerNode val (removeMin left) right
