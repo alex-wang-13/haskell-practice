@@ -170,8 +170,8 @@ input list has a different number of sublists.
 -}
 sum_of_maxes :: (Ord a, Num a) => [[a]] -> [[a]] -> Maybe [a]
 sum_of_maxes l1 l2
-    | length l1 /= length l2 = Nothing
-    | any null l1 || any null l2 = Nothing
+    | length l1 /= length l2     = Nothing -- if list lengths are different
+    | any null l1 || any null l2 = Nothing -- if any sublist is empty
     | otherwise = Just (zipWith (+) (map maximum l1) (map maximum l2))
 
 {-
@@ -190,13 +190,23 @@ Pair 8 (Pair 10 (Pair 12 Null))
 -}
 data MyList l = Null | Pair l (MyList l) deriving (Show)
 
+{-
+append takes two MyLists and attaches the second
+to the end of the first.
+-}
 append :: MyList a -> MyList a -> MyList a
 append Null t = t
 append (Pair h t1) t2 = Pair h (t1 `append` t2)
 
+{-
+lbind performs a function on each element of MyList.
+-}
 lbind :: MyList a -> (a -> MyList b) -> MyList b
 lbind Null _ = Null
 lbind (Pair h t) f = f h `append` (t `lbind` f)
 
+{-
+lreturn gives a new MyList without a "tail."
+-}
 lreturn :: a -> MyList a
 lreturn x = Pair x Null
