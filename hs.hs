@@ -9,6 +9,8 @@ element is replaced by the second, the second
 element is replaced by the third, and the third
 is replaced by the first.
 -}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use camelCase" #-}
 rotate :: Eq a => a -> a -> a -> [a] -> [a]
 rotate _ _ _ []    = []
 rotate a b c (h:t)
@@ -111,3 +113,90 @@ removeMin (InnerNode val Empty right)       = right    -- min removed from Inner
 removeMin (InnerNode val (Leaf left) Empty) = Leaf val -- min removed from InnerNode w/ Leaf left and Empty right
 removeMin (InnerNode val left right)        = InnerNode val (removeMin left) right -- removeMin from the left
 
+-- Author: Alex Wang --
+-- Part 3: Haskell Monads --
+
+{-
+7. Using the Maybe monad of Haskell, create a
+function that has the following type:
+
+function:: a -> Maybe [a] -> (a -> Bool) -> Maybe [a]
+
+The function takes a value of some type, a list
+of the same type (as a monad), and a test function
+and returns a list (in a monad). If the character
+passes the test, the character is appended to the
+monad list. Otherwise the result is Nothing.
+-}
+myfunction :: a -> Maybe [a] -> (a -> Bool) -> Maybe [a]
+myfunction a l f
+    | f a           = l >>= (\x -> return (x++[a]))
+    | otherwise     = Nothing
+
+{-
+7. checklist takes a list and a function and returns
+Nothing if the elements in the list fail to past the
+function and the list (embedded in a Maybe) if
+all the elements pass.
+-}
+checklist :: [a] -> (a -> Bool) -> Maybe [a]
+checklist [] f = Just []
+checklist l  f
+    | all f l   = Just l
+    | otherwise = Nothing
+
+{-
+8. checkappend takes two Maybe lists and a test function
+and appends the first list to the second only if all
+characters of the first list pass the test. The return
+is Nothing if any character of the first list does not
+pass the test. The second list does not have to pass a
+test.
+-}
+checkappend :: Maybe [a] -> Maybe [a] -> (a -> Bool) -> Maybe [a]
+checkappend m1 m2 f = do
+    l1 <- m1
+    l2 <- m2
+    if all f l1 then Just (l1++l2) else Nothing
+
+{-
+9. sum_of_maxes that takes two lists of lists of numbers
+and creates a single list of numbers. The kth value of
+the output list is the largest value of the kth sublist
+of the first input list added to the largest value of
+the kth sublist of the second input list. This routine
+should return Nothing if any sublist is empty, or if each
+input list has a different number of sublists.
+-}
+sum_of_maxes :: (Ord a, Num a) => [[a]] -> [[a]] -> Maybe [a]
+sum_of_maxes l1 l2
+    | length l1 /= length l2 = Nothing
+    | any null l1 || any null l2 = Nothing
+    | otherwise = Just (zipWith (+) (map maximum l1) (map maximum l2))
+
+{-
+10. Create a list monad that generalizes a list. This will
+not be a Haskell Monad type, but instead one of our own
+creation like the Value type from lecture. For example,
+the following is a valid "list":
+
+Pair 4 (Pair 5 (Pair 6 Null))
+
+Then create a binding function lbind and a return function
+lreturn to make a list monad. The code should work so that:
+
+> (Pair 4 (Pair 5 (Pair 6 Null))) `lbind` (\x -> lreturn (2 * x))   
+Pair 8 (Pair 10 (Pair 12 Null))
+-}
+data MyList l = Null | Pair l (MyList l) deriving (Show)
+
+append :: MyList a -> MyList a -> MyList a
+append Null t = t
+append (Pair h t1) t2 = Pair h (t1 `append` t2)
+
+lbind :: MyList a -> (a -> MyList b) -> MyList b
+lbind Null _ = Null
+lbind (Pair h t) f = f h `append` (t `lbind` f)
+
+lreturn :: a -> MyList a
+lreturn x = Pair x Null
